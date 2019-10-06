@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_udemy_firebase/services/auth.dart';
 
 class HomePage extends StatelessWidget {
+  final VoidCallback onSignOut;
+  final AuthBase auth;
+
+  const HomePage({@required this.auth, @required this.onSignOut});
+
+  Future<void> _signOut() async {
+    try {
+      auth.signOut();
+      onSignOut();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,26 +23,14 @@ class HomePage extends StatelessWidget {
         title: Text('Главная страница'),
         actions: <Widget>[
           FlatButton(
-            child: Text('Выйти', style: TextStyle(color: Colors.white),),
-            onPressed: (){},
+            child: Text(
+              'Выйти',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            onPressed: _signOut,
           )
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            'Вилена', style: TextStyle(fontSize: 40, color: Colors.red), textAlign: TextAlign.center,
-          ),
-          Image.asset('images/vilena.jpg', width: 300, height: 300,),
-          Text(
-            'Кристина', style: TextStyle(fontSize: 40, color: Colors.orange), textAlign: TextAlign.center,
-          ),
-          Image.asset('images/kristina.jpg', width: 300, height: 300,),
-
-        ],
-      ),
-
     );
   }
 }
