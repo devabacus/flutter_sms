@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "182340354389",
+    "firebase_url": "https://tracker-time-61b0a.firebaseio.com",
+    "project_id": "tracker-time-61b0a",
+    "storage_bucket": "tracker-time-61b0a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:182340354389:android:f021533c876e428d04efdc",
+        "android_client_info": {
+          "package_name": "remotescale.ru.flutter_udemy_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "182340354389-qgo6tf0dkkkt5c4lqf694tft8v66jr9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKmb0_F1BoKKIcA0_5IihdU1_iX2XjgaE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "182340354389-qgo6tf0dkkkt5c4lqf694tft8v66jr9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
