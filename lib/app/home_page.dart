@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_udemy_firebase/common_widgets/platform_alert_dialog.dart';
 import 'package:flutter_udemy_firebase/services/auth.dart';
+import 'package:flutter_udemy_firebase/services/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
-  final VoidCallback onSignOut;
-  final AuthBase auth;
 
-  const HomePage({@required this.auth, @required this.onSignOut});
-
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
     try {
+      final auth = AuthProvider.of(context);
       auth.signOut();
-      onSignOut();
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final didRequestSignOut = await PlatformAlertDialog(
+      title: 'Выход',
+      content: 'Вы действительно хотите выйте?',
+      cancelActionText: 'Отмена',
+      defaultActionText: 'Выход',
+    ).show(context);
+
+    if(didRequestSignOut == true) {
+      _signOut(context);
     }
   }
 
@@ -27,7 +38,7 @@ class HomePage extends StatelessWidget {
               'Выйти',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
-            onPressed: _signOut,
+            onPressed: () => _confirmSignOut(context),
           )
         ],
       ),
