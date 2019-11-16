@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_udemy_firebase/common_widgets/platform_alert_dialog.dart';
 import 'package:flutter_udemy_firebase/services/auth.dart';
-import 'package:flutter_udemy_firebase/services/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
-
   Future<void> _signOut(BuildContext context) async {
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context);
+
       auth.signOut();
     } catch (e) {
       print(e);
@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
       defaultActionText: 'Выход',
     ).show(context);
 
-    if(didRequestSignOut == true) {
+    if (didRequestSignOut == true) {
       _signOut(context);
     }
   }

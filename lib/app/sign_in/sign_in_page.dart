@@ -1,42 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_udemy_firebase/app/sign_in/email_sign_in_page.dart';
+import 'package:flutter_udemy_firebase/app/sign_in/sign_in_manager.dart';
 import 'package:flutter_udemy_firebase/app/sign_in/sign_in_button.dart';
 import 'package:flutter_udemy_firebase/app/sign_in/social_signin_button.dart';
 import 'package:flutter_udemy_firebase/services/auth.dart';
-import 'package:flutter_udemy_firebase/services/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
+  final SignInManager manager;
+  final bool isLoading;
+
+  const SignInPage({Key key, @required this.manager, @required this.isLoading})
+      : super(key: key);
+
+  static Widget create(BuildContext context) {
+    final auth = Provider.of<AuthBase>(context);
+    return Provider<ValueNotifier<bool>>(
+      builder: (context) => ValueNotifier<bool>(false),
+      dispose: (context, valueNotifier) => valueNotifier.dispose(),
+      child: Consumer<ValueNotifier<bool>>(
+        builder: (context, valueNotifier, _) => Provider<SignInManager>(
+          builder: (_) => SignInManager(auth: auth, isLoading: valueNotifier),
+          child: Consumer<SignInManager>(
+            builder: (context, manager, _) => ValueListenableBuilder<bool>(
+              valueListenable: valueNotifier,
+              builder: (context, isLoading, _) => SignInPage(
+                manager: manager,
+                isLoading: isLoading,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<void> _signInAnonymously(BuildContext context) async {
     try {
-      final auth = AuthProvider.of(context);
-      await auth.signInAnonimously();
-    }
-      catch (e) {
+      await manager.signInAnonimously();
+    } catch (e) {
       print(e);
     }
   }
 
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
-      final auth = AuthProvider.of(context);
-      await auth.signInWithGoogle();
-    }
-    catch (e) {
+      await manager.signInWithGoogle();
+    } catch (e) {
       print(e);
     }
   }
 
   void _signInWithEmail(BuildContext context) {
-
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+    Navigator.of(context).push(MaterialPageRoute<void>(
 //        fullscreenDialog: true,
-        builder: (context) => EmailSignInPage()
-      )
-    );
+        builder: (context) => EmailSignInPage()));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,17 +76,13 @@ class SignInPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            "Sign in",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w300),
-          ),
+          SizedBox(height: 50, child: _buildHeader()),
           SizedBox(
             height: 30,
           ),
           SocialSignInButton(
             color: Colors.white,
-            onPressed: () => _signInWithGoogle(context),
+            onPressed: isLoading ? null : () => _signInWithGoogle(context),
             imageAsset: 'images/google-logo.png',
             text: 'Войти через Google',
             textColor: Colors.black,
@@ -89,7 +104,7 @@ class SignInPage extends StatelessWidget {
             text: 'Войти через Email',
             textColor: Colors.white,
             color: Colors.teal[700],
-            onPressed: ()=>_signInWithEmail(context),
+            onPressed: isLoading ? null : () => _signInWithEmail(context),
           ),
           SizedBox(
             height: 10,
@@ -106,11 +121,23 @@ class SignInPage extends StatelessWidget {
             text: 'Гостевой режим',
             textColor: Colors.white,
             color: Colors.deepOrange,
-            onPressed: () => _signInAnonymously(context),
+            onPressed: isLoading ? null : () => _signInAnonymously(context),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildHeader() {
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return Text(
+      "Sign in",
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w300),
+    );
   }
+}

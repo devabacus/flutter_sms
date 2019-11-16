@@ -1,58 +1,65 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_udemy_firebase/app/sign_in/validators.dart';
 import 'package:flutter_udemy_firebase/common_widgets/form_submit_button.dart';
-import 'package:flutter_udemy_firebase/common_widgets/platform_alert_dialog.dart';
+import 'package:flutter_udemy_firebase/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:flutter_udemy_firebase/services/auth.dart';
-import 'package:flutter_udemy_firebase/services/auth_provider.dart';
+import 'package:provider/provider.dart';
 
-enum EmailSignInFormType { signIn, register }
+import 'email_sign_in_model.dart';
 
-class EmailSignForm extends StatefulWidget with EmailAndPasswordValidators {
+
+class EmailSignInFormStateful extends StatefulWidget with EmailAndPasswordValidators {
   @override
-  _EmailSignFormState createState() => _EmailSignFormState();
+  _EmailSignInFormStatefulState createState() => _EmailSignInFormStatefulState();
 }
 
-class _EmailSignFormState extends State<EmailSignForm> {
+class _EmailSignInFormStatefulState extends State<EmailSignInFormStateful> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
 
   EmailSignInFormType _formType = EmailSignInFormType.signIn;
-
   String get _email => _emailController.text;
-
   String get _pass => _passController.text;
   bool _submitted = false;
   bool _isLoading = false;
 
-  void _submit() async {
+  Future<void> _submit() async {
     print('submit called');
     setState(() {
       _submitted = true;
       _isLoading = true;
     });
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context);
+
       if (_formType == EmailSignInFormType.signIn) {
         await auth.signInWithEmailAndPassword(_email, _pass);
       } else {
         await auth.createUserWithEmailAndPassword(_email, _pass);
       }
       Navigator.of(context).pop();
-    } catch (e) {
-      PlatformAlertDialog(
+    } on PlatformException catch (e) {
+      PlatformExceptionAlertDialog(
         title: "Ошибка авторизации чувак",
-        content: e.toString(),
-        defaultActionText: 'OK',
+        exception: e,
       ).show(context);
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  @override
+  void dispose(){
+    _emailController.dispose();
+    _passController.dispose();
+    _emailFocusNode.dispose();
+    _passFocusNode.dispose();
+    super.dispose();
   }
 
   void _emailEditingComplete() {
